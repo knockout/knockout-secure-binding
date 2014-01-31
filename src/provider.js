@@ -45,6 +45,10 @@ function getBindingAccessors(node, context) {
         sbind_string = node.getAttribute(this.attribute);
     }
 
+    if (node.nodeType === node.COMMENT_NODE) {
+        sbind_string = node.nodeValue.replace(this.virtualAttribute, "");
+    }
+
     if (sbind_string) {
         bindings = new Parser(node, context, this.globals).parse(
             sbind_string);

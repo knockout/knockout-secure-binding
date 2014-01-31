@@ -208,6 +208,20 @@ describe("Knockout Secure Binding", function () {
         })
     })
 
+    describe("Virtual elements", function() {
+        beforeEach(function () {
+            ko.bindingProvider.instance = new ko.secureBindingsProvider({virtualAttribute: "ko "})
+        })
+
+        it("binds Text in virtual element", function () {
+            var div = document.createElement("div")
+            div.innerHTML = "<!-- ko text: obs --> <!-- /ko -->"
+            ko.applyBindings({obs: ko.observable("a towel")}, div)
+            var indexOk = div.innerHTML.indexOf("a towel") > 0
+            assert.ok(indexOk)
+        })
+    })
+
     describe("The lookup of variables (get_lookup_root)", function () {
         it("accesses the context", function () {
             var binding = "a: x",
