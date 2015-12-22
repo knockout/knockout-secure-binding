@@ -752,6 +752,43 @@ describe("the bindings parser", function () {
     })
 })
 
+describe("the parser cache", function () {
+      var instance, div;
+      beforeEach(function () {
+            instance = new ko.secureBindingsProvider();
+            div = document.createElement("div");
+      });
+      it("caches binding strings", function () {
+            div.setAttribute('data-sbind', 'x: 123');
+            instance.getBindingAccessors(div, {})
+            assert.deepEqual(Object.keys(instance.cache), ["x: 123"])
+      })
+      it("repeated calls return same item", function () {
+            var key = 'x: 2';
+            div.setAttribute('data-sbind', key);
+            var ba1 = instance.getBindingAccessors(div, {});
+            var ba2 = instance.getBindingAccessors(div, {});
+            assert.strictEqual(ba1, ba2, 'bak')
+            assert.strictEqual(ba1, instance.cache[key], 'bik')
+      })
+      it("respects nested lookups", function () {
+            ko.bindingProvider.instance = instance;
+            div.innerHTML =
+               "<i data-sbind='text: X'></i>" +
+               "<a data-sbind='template: { data: Y }'>" +
+                  "<b data-sbind='text: X'></b>" +
+               "</a>";
+            var view = {
+               X: ko.observable(3),
+               Y: {
+                  X: ko.observable(4),
+               }
+            };
+            ko.applyBindings(view, div);
+            assert.equal(div.innerHTML, '')
+      })
+})
+
 describe("the parsing of expressions", function () {
     it("works with explicit braces ( )", function () {
         var binding = "attr : (x)",
